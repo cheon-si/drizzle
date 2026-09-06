@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 슬비의 카페 지도 ☕️
 
-## Getting Started
+1인용 카페 아카이브. 카카오맵 위에 다녀온/가고 싶은 카페를 핀으로 모으고 별점과 메모를 남긴다.
 
-First, run the development server:
+- Next.js 16 (App Router) + Tailwind v4
+- Drizzle ORM + Neon Postgres (serverless HTTP 드라이버)
+- Kakao Maps JS SDK + Kakao Local REST API (서버 프록시)
+- 인증: 비밀번호 1개 + httpOnly 쿠키 (`src/proxy.ts`에서 전 경로 보호)
+
+## 1. 카카오 키 발급 (5분)
+
+1. https://developers.kakao.com → 내 애플리케이션 → 앱 만들기
+2. **앱 설정 > 앱 키**: `JavaScript 키`, `REST API 키` 복사
+3. **앱 설정 > 플랫폼 > Web**: 사이트 도메인 등록
+   - `http://localhost:3000`
+   - `https://<프로젝트>.vercel.app` (배포 후 추가)
+4. **제품 설정 > 카카오맵**: 사용 설정 **ON** (2024-12 이후 신규 앱 필수)
+
+## 2. 로컬 실행
 
 ```bash
+cp .env.example .env.local   # 값 채우기
+npm install
+npm run db:push              # 스키마를 Neon에 반영
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`DATABASE_URL`은 https://neon.tech 에서 무료 프로젝트를 만들어 받거나, 아래 Vercel 연동 후 `vercel env pull .env.local`로 받아온다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3. Vercel 배포
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. GitHub에 push → Vercel에서 Import
+2. **Storage 탭 → Create → Neon** (마켓플레이스, 카드 불필요) → `DATABASE_URL` 자동 주입
+3. **Settings → Environment Variables**에 나머지 추가
+   - `APP_PASSWORD` 슬비가 쓸 비밀번호
+   - `AUTH_SECRET` 아무 랜덤 문자열 (`openssl rand -hex 32`)
+   - `KAKAO_REST_KEY`
+   - `NEXT_PUBLIC_KAKAO_JS_KEY`
+4. 로컬에서 `vercel env pull .env.local && npm run db:push` 로 테이블 생성 (1회)
+5. Redeploy → 카카오 콘솔에 배포 도메인 등록
 
-## Learn More
+비밀번호를 바꾸면 기존 로그인은 전부 무효가 된다 (쿠키 토큰이 비밀번호에서 파생).
 
-To learn more about Next.js, take a look at the following resources:
+## 스크립트
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| 명령 | 설명 |
+|---|---|
+| `npm run dev` | 개발 서버 |
+| `npm run db:push` | 스키마 → DB 반영 (마이그레이션 파일 없이) |
+| `npm run db:studio` | Drizzle Studio로 데이터 보기 |
+| `npm run typecheck` / `lint` / `build` | 검증 |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 구조
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  proxy.ts               인증 게이트 (Next 16의 middleware)
+  lib/auth.ts            세션 토큰 계산
+  db/schema.ts           cafes, notes
+  app/page.tsx           로그인
+  app/map/page.tsx       지도 (기본 화면)
+  app/list/page.tsx      목록 + 정렬/필터
+  app/api/search/route.ts  카카오 키워드 검색 프록시 (REST 키 서버 보관)
+  app/actions.ts         저장/별점/상태/메모 서버 액션
+  components/MapView.tsx    SDK 로드, 마커, 클러스터(30개 이상)
+  components/SearchSheet.tsx
+  components/CafeSheet.tsx  상세 바텀시트
+```

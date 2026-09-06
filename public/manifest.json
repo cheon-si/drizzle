@@ -1,0 +1,9 @@
+{
+  "name": "슬비의 카페 지도",
+  "short_name": "카페 지도",
+  "start_url": "/map",
+  "display": "standalone",
+  "background_color": "#fbf6ee",
+  "theme_color": "#fbf6ee",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
