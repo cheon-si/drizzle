@@ -1,5 +1,7 @@
 # 슬비의 카페 지도 ☕️
 
+https://drizzle-lake.vercel.app
+
 1인용 카페 아카이브. 카카오맵 위에 다녀온/가고 싶은 카페를 핀으로 모으고 별점과 메모를 남긴다.
 
 - Next.js 16 (App Router) + Tailwind v4
