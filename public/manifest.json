@@ -1,6 +1,6 @@
 {
-  "name": "@youlikedrizzle",
-  "short_name": "@youlikedrizzle",
+  "name": "@42drizzle",
+  "short_name": "@42drizzle",
   "start_url": "/map",
   "display": "standalone",
   "background_color": "#fbf6ee",

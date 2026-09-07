@@ -13,7 +13,7 @@ export default function LoginPage() {
       >
         <div className="mb-5 text-center">
           <div className="text-4xl">☕️</div>
-          <h1 className="mt-2 text-lg font-semibold">@youlikedrizzle</h1>
+          <h1 className="mt-2 text-lg font-semibold">@42drizzle</h1>
         </div>
         <input
           type="password"
