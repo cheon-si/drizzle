@@ -95,7 +95,7 @@ export async function addNote(cafeId: string, body: string, visitedOn: string | 
   const text = body.trim();
   if (!text || text.length > 1000) throw new Error("invalid note");
   await db.insert(notes).values({ cafeId, body: text, visitedOn: visitedOn || null });
-  // 메모를 남기면 자연스럽게 '가봄'으로
+  // 기록을 남기면 자연스럽게 '다녀옴'(visited)으로
   await db
     .update(cafes)
     .set({ status: "visited", updatedAt: new Date() })

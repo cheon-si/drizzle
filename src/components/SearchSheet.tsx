@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { X } from "lucide-react";
 import type { SearchResult } from "@/app/api/search/route";
 import { saveCafe } from "@/app/actions";
 
@@ -81,10 +82,10 @@ export default function SearchSheet({
               setQ("");
               onPick(null);
             }}
-            className="text-mocha"
+            className="rounded-full p-1.5 text-mocha active:bg-cream"
             aria-label="지우기"
           >
-            ✕
+            <X size={18} />
           </button>
         )}
       </div>

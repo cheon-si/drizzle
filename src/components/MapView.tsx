@@ -2,6 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LocateFixed } from "lucide-react";
 import type { CafeDto } from "@/lib/dto";
 import type { SearchResult } from "@/app/api/search/route";
 import { markerSvg, MARKER_SIZE } from "@/lib/marker";
@@ -197,9 +198,9 @@ export default function MapView({ cafes, initialSelectedId, jsKey }: Props) {
       <button
         onClick={locate}
         aria-label="현재 위치"
-        className="absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full bg-white shadow-md active:scale-95"
+        className="absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full bg-white text-cocoa shadow-md active:scale-95"
       >
-        📍
+        <LocateFixed size={20} />
       </button>
 
       {selected ? (
