@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "슬비의 카페 지도",
+  title: "@youlikedrizzle",
   description: "다녀온 카페, 가고 싶은 카페",
   manifest: "/manifest.json",
-  appleWebApp: { capable: true, title: "카페 지도", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "@youlikedrizzle", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
