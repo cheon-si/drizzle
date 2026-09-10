@@ -43,6 +43,21 @@ npm run dev
 
 비밀번호를 바꾸면 기존 로그인은 전부 무효가 된다 (쿠키 토큰이 비밀번호에서 파생).
 
+## 4. 사진 저장소 (Vercel Blob, private)
+
+기록당 사진 1장. 파일은 Vercel Blob **private** 스토어에, DB(`notes.photo_url`)에는 URL만 저장한다.
+로그인한 사람만 `/api/photo?p=<pathname>` 경유로 볼 수 있다.
+
+```bash
+vercel blob create-store <이름> --access private --region icn1 -e production -e preview -e development --yes
+vercel env pull .env.local --environment=production
+```
+
+- 브라우저에서 긴 변 1600px·WebP로 줄인 뒤 Blob에 직접 업로드한다 (서버 4.5MB 제한 회피, EXIF 제거).
+- `BLOB_READ_WRITE_TOKEN`은 운영 스토어 읽기·쓰기 권한이다. 로컬에서 기록을 지우면 운영 사진도 지워진다.
+- Hobby 한도(5GB)를 넘으면 과금 대신 30일 차단된다. Vercel 사용량 알림 메일을 꺼두지 말 것.
+- 설계 메모: `docs/photo-upload-plan.md`
+
 ## 스크립트
 
 | 명령 | 설명 |

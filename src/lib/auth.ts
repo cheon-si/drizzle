@@ -11,3 +11,8 @@ export async function sessionToken(): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+
+/** 요청 쿠키의 세션 토큰이 유효한지. proxy·업로드·사진 라우트가 같은 검사를 공유한다. */
+export async function isAuthed(cookieValue: string | undefined): Promise<boolean> {
+  return !!cookieValue && cookieValue === (await sessionToken());
+}

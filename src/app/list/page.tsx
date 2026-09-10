@@ -105,9 +105,24 @@ export default async function ListPage({ searchParams }: PageProps<"/list">) {
               <li key={c.id}>
                 <Link
                   href={`/map?cafe=${c.id}`}
-                  className="block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-cream-deep/60 active:scale-[0.99]"
+                  className="relative block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-cream-deep/60 active:scale-[0.99]"
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  {/* 최신 기록 사진을 카드 우상단 썸네일로. 있을 때만 상태 배지가 아래로 내려간다 */}
+                  {latest?.photoSrc && (
+                    // private Blob은 /api/photo 경유라 next/image 최적화를 쓸 수 없다 → 일반 img
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={latest.photoSrc}
+                      alt=""
+                      loading="lazy"
+                      className="absolute right-4 top-4 h-14 w-14 rounded-xl bg-cream object-cover"
+                    />
+                  )}
+                  <div
+                    className={`flex items-start justify-between gap-2 ${
+                      latest?.photoSrc ? "pr-16" : ""
+                    }`}
+                  >
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="truncate font-semibold">{c.name}</span>
@@ -134,7 +149,11 @@ export default async function ListPage({ searchParams }: PageProps<"/list">) {
                     </span>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between">
+                  <div
+                    className={`mt-2 flex items-center justify-between ${
+                      latest?.photoSrc ? "pr-16" : ""
+                    }`}
+                  >
                     <div className="flex items-center gap-2">
                       <StarRating value={c.rating} size="sm" />
                       <span className="text-xs text-latte-deep">

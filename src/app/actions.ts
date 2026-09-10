@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { cafes, notes } from "@/db/schema";
 import { SESSION_COOKIE, sessionToken } from "@/lib/auth";
+import { deleteBlobs, isBlobUrl } from "@/lib/blob";
 import type { SearchResult } from "./api/search/route";
 
 function revalidate() {
@@ -87,14 +88,29 @@ export async function setStatus(id: string, status: "visited" | "wishlist") {
 }
 
 export async function deleteCafe(id: string) {
+  // 기록 사진 URL을 먼저 모아두고, DB(cascade) → Blob 순서로 지운다
+  const photos = await db
+    .select({ photoUrl: notes.photoUrl })
+    .from(notes)
+    .where(eq(notes.cafeId, id));
   await db.delete(cafes).where(eq(cafes.id, id));
+  await deleteBlobs(photos.map((p) => p.photoUrl));
   revalidate();
 }
 
-export async function addNote(cafeId: string, body: string, visitedOn: string | null) {
+export async function addNote(
+  cafeId: string,
+  body: string,
+  visitedOn: string | null,
+  photoUrl: string | null = null,
+) {
   const text = body.trim();
   if (!text || text.length > 1000) throw new Error("invalid note");
-  await db.insert(notes).values({ cafeId, body: text, visitedOn: visitedOn || null });
+  // 클라이언트가 넘긴 URL은 우리 Blob 스토어 것만 허용
+  if (photoUrl !== null && !isBlobUrl(photoUrl)) throw new Error("invalid photo url");
+  await db
+    .insert(notes)
+    .values({ cafeId, body: text, visitedOn: visitedOn || null, photoUrl });
   // 기록을 남기면 자연스럽게 '다녀옴'(visited)으로
   await db
     .update(cafes)
@@ -104,6 +120,17 @@ export async function addNote(cafeId: string, body: string, visitedOn: string | 
 }
 
 export async function deleteNote(id: string) {
+  const [row] = await db
+    .select({ photoUrl: notes.photoUrl })
+    .from(notes)
+    .where(eq(notes.id, id));
   await db.delete(notes).where(eq(notes.id, id));
+  await deleteBlobs([row?.photoUrl]);
   revalidate();
+}
+
+/** 업로드는 됐는데 addNote가 실패했을 때 클라이언트가 고아 파일을 바로 치우는 용도 */
+export async function removeBlob(url: string) {
+  if (!isBlobUrl(url)) return;
+  await deleteBlobs([url]);
 }
