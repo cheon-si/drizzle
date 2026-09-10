@@ -24,6 +24,7 @@ import {
 } from "@/app/actions";
 import { kakaoMapUrl, naverMapUrl } from "@/lib/links";
 import StarRating from "./StarRating";
+import ConfirmSheet from "./ConfirmSheet";
 
 type Props = {
   cafe: CafeDto;
@@ -46,6 +47,12 @@ export default function CafeSheet({ cafe, onClose, onToast }: Props) {
   const [photo, setPhoto] = useState<Photo | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // 브라우저 confirm() 대신 쓰는 확인 시트. null이면 닫힘
+  const [confirmSheet, setConfirmSheet] = useState<{
+    title: string;
+    description?: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   const clearPhoto = () => {
     if (photo) URL.revokeObjectURL(photo.previewUrl);
@@ -287,10 +294,13 @@ export default function CafeSheet({ cafe, onClose, onToast }: Props) {
               <div className="flex items-center justify-between text-xs text-mocha">
                 <span>{n.visitedOn ?? n.createdAt.slice(0, 10)}</span>
                 <button
-                  onClick={() => {
-                    if (confirm("이 기록을 지울까요?"))
-                      start(() => deleteNote(n.id));
-                  }}
+                  onClick={() =>
+                    setConfirmSheet({
+                      title: "이 기록을 지울까요?",
+                      description: n.photoSrc ? "사진도 함께 삭제돼요." : undefined,
+                      onConfirm: () => start(() => deleteNote(n.id)),
+                    })
+                  }
                   className="rounded-full p-1 text-mocha/60 active:bg-cream"
                   aria-label="기록 삭제"
                 >
@@ -315,19 +325,35 @@ export default function CafeSheet({ cafe, onClose, onToast }: Props) {
         </ul>
 
         <button
-          onClick={() => {
-            if (confirm(`"${cafe.name}"을(를) 지도에서 지울까요? 기록도 함께 삭제돼요.`))
-              start(async () => {
-                await deleteCafe(cafe.id);
-                onClose();
-                onToast("삭제했어요");
-              });
-          }}
+          onClick={() =>
+            setConfirmSheet({
+              title: `${cafe.name}을(를) 지도에서 지울까요?`,
+              description: "기록과 사진도 함께 삭제돼요.",
+              onConfirm: () =>
+                start(async () => {
+                  await deleteCafe(cafe.id);
+                  onClose();
+                  onToast("삭제했어요");
+                }),
+            })
+          }
           className="mt-6 w-full py-2 text-center text-xs text-mocha/60"
         >
           이 카페 삭제
         </button>
       </div>
+
+      {confirmSheet && (
+        <ConfirmSheet
+          title={confirmSheet.title}
+          description={confirmSheet.description}
+          onCancel={() => setConfirmSheet(null)}
+          onConfirm={() => {
+            confirmSheet.onConfirm();
+            setConfirmSheet(null);
+          }}
+        />
+      )}
     </div>
   );
 }
