@@ -93,7 +93,10 @@ export default function SearchSheet({
       {candidate && (
         <div className="mx-3 mb-2 flex items-center justify-between rounded-xl bg-cream-deep/60 px-3 py-2">
           <div className="min-w-0">
-            <div className="truncate font-semibold">{candidate.name}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="truncate font-semibold">{candidate.name}</span>
+              <CategoryTag r={candidate} />
+            </div>
             <div className="truncate text-xs text-mocha">
               {candidate.roadAddress || candidate.address}
             </div>
@@ -130,7 +133,10 @@ export default function SearchSheet({
                 className="flex w-full items-start justify-between gap-2 rounded-xl px-3 py-2.5 text-left active:bg-cream"
               >
                 <div className="min-w-0">
-                  <div className="truncate font-medium">{r.name}</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate font-medium">{r.name}</span>
+                    <CategoryTag r={r} />
+                  </div>
                   <div className="truncate text-xs text-mocha">
                     {r.roadAddress || r.address}
                   </div>
@@ -144,5 +150,15 @@ export default function SearchSheet({
         </ul>
       )}
     </div>
+  );
+}
+
+/** 카페가 아닌 검색 결과에만 업종을 작게 표시 (예: 와인바). 카페는 기본값이라 생략 */
+function CategoryTag({ r }: { r: SearchResult }) {
+  if (r.categoryGroup === "CE7" || !r.category) return null;
+  return (
+    <span className="shrink-0 rounded-full bg-wine/15 px-1.5 py-0.5 text-[10px] font-medium text-wine-deep">
+      {r.category}
+    </span>
   );
 }

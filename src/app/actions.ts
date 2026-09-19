@@ -49,6 +49,8 @@ export async function saveCafe(r: SearchResult) {
       lat: r.lat,
       lng: r.lng,
       placeUrl: r.placeUrl || null,
+      category: r.category || null,
+      categoryGroup: r.categoryGroup || null,
     })
     .onConflictDoUpdate({
       target: cafes.kakaoPlaceId,
@@ -60,6 +62,8 @@ export async function saveCafe(r: SearchResult) {
         lat: r.lat,
         lng: r.lng,
         placeUrl: r.placeUrl || null,
+        category: r.category || null,
+        categoryGroup: r.categoryGroup || null,
         updatedAt: new Date(),
       },
     })

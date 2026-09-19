@@ -11,6 +11,10 @@ export type CafeDto = {
   lat: number;
   lng: number;
   placeUrl: string | null;
+  /** 마지막 카테고리 (예: "와인바"). 카페면 null일 수 있음 */
+  category: string | null;
+  /** 카카오 그룹 코드 CE7 또는 null(구 데이터)이면 카페 */
+  isCafe: boolean;
   status: "visited" | "wishlist";
   rating: number | null;
   createdAt: string;
@@ -46,6 +50,8 @@ export function toDto(c: CafeWithNotes): CafeDto {
     lat: c.lat,
     lng: c.lng,
     placeUrl: c.placeUrl,
+    category: c.category,
+    isCafe: c.categoryGroup === null || c.categoryGroup === "CE7",
     status: c.status,
     rating: c.rating === null ? null : Number(c.rating),
     createdAt: c.createdAt.toISOString(),

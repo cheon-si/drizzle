@@ -115,7 +115,14 @@ export default function CafeSheet({ cafe, onClose, onToast }: Props) {
       {/* 헤더: 이름 · 주소 · 닫기 */}
       <div className="flex items-start justify-between gap-2 px-4 pt-2">
         <div className="min-w-0">
-          <h2 className="truncate text-lg font-bold">{cafe.name}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="truncate text-lg font-bold">{cafe.name}</h2>
+            {!cafe.isCafe && cafe.category && (
+              <span className="shrink-0 rounded-full bg-wine/15 px-2 py-0.5 text-[11px] font-medium text-wine-deep">
+                {cafe.category}
+              </span>
+            )}
+          </div>
           <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-mocha">
             <MapPin size={12} className="shrink-0" />
             {cafe.roadAddress || cafe.address}

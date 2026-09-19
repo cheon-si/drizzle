@@ -22,6 +22,10 @@ export const cafes = pgTable(
     lat: doublePrecision("lat").notNull(),
     lng: doublePrecision("lng").notNull(),
     placeUrl: text("place_url"),
+    /** 마지막 카테고리 표시용 (예: "와인바"). 기존 행은 null = 카페 */
+    category: text("category"),
+    /** 카카오 그룹 코드 (CE7=카페). null이면 카페로 간주 */
+    categoryGroup: text("category_group"),
     status: text("status", { enum: ["visited", "wishlist"] })
       .notNull()
       .default("wishlist"),

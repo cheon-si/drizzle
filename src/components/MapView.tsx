@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LocateFixed } from "lucide-react";
 import type { CafeDto } from "@/lib/dto";
 import type { SearchResult } from "@/app/api/search/route";
-import { markerSvg, MARKER_SIZE } from "@/lib/marker";
+import { markerKey, markerSvg, MARKER_SIZE, type MarkerKind } from "@/lib/marker";
 import SearchSheet from "./SearchSheet";
 import CafeSheet from "./CafeSheet";
 
@@ -89,18 +89,18 @@ export default function MapView({ cafes, initialSelectedId, jsKey }: Props) {
     const size = new kakao.maps.Size(MARKER_SIZE.w, MARKER_SIZE.h);
     const offset = new kakao.maps.Point(MARKER_SIZE.w / 2, MARKER_SIZE.h);
     const images: Record<string, any> = {};
-    const img = (kind: "wishlist" | "visited" | "love") =>
-      (images[kind] ??= new kakao.maps.MarkerImage(markerSvg(kind), size, {
+    const img = (kind: MarkerKind) =>
+      (images[markerKey(kind)] ??= new kakao.maps.MarkerImage(markerSvg(kind), size, {
         offset,
       }));
 
     const markers = cafes.map((c) => {
-      const kind =
-        c.status === "wishlist"
-          ? "wishlist"
-          : (c.rating ?? 0) >= 4.5
-            ? "love"
-            : "visited";
+      // 하트 배지는 다녀온 곳 중 4.5점 이상. 카페가 아니면 색이 와인색으로 바뀐다
+      const kind: MarkerKind = {
+        status: c.status,
+        isCafe: c.isCafe,
+        love: c.status === "visited" && (c.rating ?? 0) >= 4.5,
+      };
       const m = new kakao.maps.Marker({
         position: new kakao.maps.LatLng(c.lat, c.lng),
         image: img(kind),
@@ -150,7 +150,7 @@ export default function MapView({ cafes, initialSelectedId, jsKey }: Props) {
     candidateRef.current = new kakao.maps.Marker({
       position: pos,
       image: new kakao.maps.MarkerImage(
-        markerSvg("candidate"),
+        markerSvg({ status: "candidate", isCafe: candidate.categoryGroup === "CE7" }),
         new kakao.maps.Size(MARKER_SIZE.w, MARKER_SIZE.h),
         { offset: new kakao.maps.Point(MARKER_SIZE.w / 2, MARKER_SIZE.h) },
       ),

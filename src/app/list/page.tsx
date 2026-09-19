@@ -126,6 +126,11 @@ export default async function ListPage({ searchParams }: PageProps<"/list">) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="truncate font-semibold">{c.name}</span>
+                        {!c.isCafe && c.category && (
+                          <span className="shrink-0 rounded-full bg-wine/15 px-1.5 py-0.5 text-[10px] font-medium text-wine-deep">
+                            {c.category}
+                          </span>
+                        )}
                         {c.rating !== null && c.rating >= 4.5 && (
                           <Heart
                             size={14}
